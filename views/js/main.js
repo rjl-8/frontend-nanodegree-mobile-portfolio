@@ -466,7 +466,7 @@ var resizePizzas = function(size) {
 
     var newWidth = sizeSwitcher(size);
 
-    var thePizzas = document.querySelectorAll(".randomPizzaContainer");
+    var thePizzas = document.getElementsByClassName("randomPizzaContainer");
     for (var i = 0; i < thePizzas.length; i++) {
       thePizzas[i].style.width = newWidth + '%';
     }
@@ -518,11 +518,15 @@ function updatePositions() {
   window.performance.mark("mark_start_frame");
 
   var items = document.querySelectorAll('.mover');
+
+  // document.body.scrollTop is no longer supported in Chrome.
   var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+  var phase = [];
+  for (var i = 0; i < 5; i++) {
+    phase.push(Math.sin(scrollTop / 1250 + i) * 100);
+  }
   for (var i = 0; i < items.length; i++) {
-    // document.body.scrollTop is no longer supported in Chrome.
-    var phase = Math.sin((scrollTop / 1250) + (i % 5));
-    items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
+    items[i].style.left = items[i].basicLeft + phase[i%5] + 'px';
   }
 
   // User Timing API to the rescue again. Seriously, it's worth learning.
@@ -540,9 +544,12 @@ window.addEventListener('scroll', updatePositions);
 
 // Generates the sliding pizzas when the page loads.
 document.addEventListener('DOMContentLoaded', function() {
-  var cols = 8;
   var s = 256;
-  for (var i = 0; i < 200; i++) {
+  var cols = 8;
+  var numPizzas = cols * Math.ceil(window.innerHeight / s) + 1;
+//  numPizzas = 200;
+//  console.log('numPizzas = ' + numPizzas)
+  for (var i = 0; i < numPizzas; i++) {
     var elem = document.createElement('img');
     elem.className = 'mover';
     elem.src = "images/pizza.png";
